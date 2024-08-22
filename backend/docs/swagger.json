@@ -1,0 +1,198 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/article": {
+            "get": {
+                "description": "Get All Article",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Article"
+                ],
+                "summary": "Get All Article",
+                "parameters": [
+                    {
+                        "enum": [
+                            "publish",
+                            "draft",
+                            "trash"
+                        ],
+                        "type": "string",
+                        "description": "Filter by Status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit of pagination",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page of pagination",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "description": "Create Article",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Article"
+                ],
+                "summary": "Create Article",
+                "parameters": [
+                    {
+                        "description": "Payload Body for Create Article [RAW]",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/posts.Form"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/article/{id}": {
+            "get": {
+                "description": "Get Detail Article by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Article"
+                ],
+                "summary": "Get Detail Article",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            },
+            "put": {
+                "description": "Update Article",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Article"
+                ],
+                "summary": "Update Article",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Payload Body for Update Article [RAW]",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/posts.Form"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "description": "Delete Article by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Article"
+                ],
+                "summary": "Delete Article",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/check-connection": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {}
+            }
+        }
+    },
+    "definitions": {
+        "posts.Form": {
+            "type": "object",
+            "required": [
+                "category",
+                "content",
+                "status",
+                "title"
+            ],
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "minLength": 3
+                },
+                "content": {
+                    "type": "string",
+                    "minLength": 200
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "publish",
+                        "draft",
+                        "trash"
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "minLength": 20
+                }
+            }
+        }
+    }
+}

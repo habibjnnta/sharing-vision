@@ -1,0 +1,220 @@
+<template>
+    <div>
+        <div class="container">
+            <br>
+        </div>
+        <div class="container">
+            <div class="row justify-content-end">
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-success" @click="showModal = true">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <br>
+        </div>
+        <div class="container">
+            <div class="row">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item" v-for="(tab, index) in tabs" :key="index">
+                        <a
+                            class="nav-link"
+                            :class="{ active: selectedTab === tab }"
+                            href="javascript:void(0);"
+                            @click="selectTab(tab)"
+                        >
+                            {{ tab }}
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3">
+                    <div v-show="selectedTab === 'Publish'">
+                        <Publish />
+                    </div>
+                    <div v-show="selectedTab === 'Draft'">
+                        <Draft />
+                    </div>
+                    <div v-show="selectedTab === 'Thrash'">
+                        <Thrash />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Add -->
+        <div v-if="showModal" class="modal fade show" tabindex="-1" style="display: block;" aria-modal="true" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add Article</h5>
+                        <button type="button" class="btn-close" @click="closeModal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form @submit.prevent="handleSubmit">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="title" v-model="formData.title" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="category" class="form-label">Category</label>
+                                <input type="text" class="form-control" id="category" v-model="formData.category" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="content" class="form-label">Content</label>
+                                <textarea class="form-control" id="content" v-model="formData.content"></textarea>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-secondary me-2" @click="handleDraftOrPublish('draft')">Draft</button>
+                                <button type="submit" class="btn btn-primary" @click="handleDraftOrPublish('publish')">Publish</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Background overlay -->
+        <div v-if="showModal" class="modal-backdrop fade show"></div>
+
+    </div>
+</template>
+  
+<script>
+  import Publish from './Tab/Publish.vue'
+  import Draft from './Tab/Draft.vue'
+  import Thrash from './Tab/Thrash.vue'
+  import axios from 'axios';
+
+  export default {
+    components: {
+      Publish,
+      Draft,
+      Thrash,
+    },
+
+    data() {
+      return {
+        tabs: ["Publish", "Draft", "Thrash"],
+        selectedTab: "Publish",
+        showModal: false,
+        id: "",
+        formData: { 
+            title: "",
+            category: "",
+            content: "",
+            status: "", 
+        },
+      };
+    },
+    methods: {
+        closeModal() {
+            this.showModal = false;
+            this.formData = {
+                title: "",
+                category: "",
+                content: "",
+                status: "", 
+            }
+        },
+        selectTab(tab) {
+            this.selectedTab = tab;
+        },
+        async handleDraftOrPublish(action) {
+            try {
+                this.formData.status = action;
+                await axios.post(import.meta.env.VITE_API_URL + '/article', this.formData);
+                this.$emit('item-added'); // Notify parent component or refresh data
+                this.closeModal();
+            } catch (error) {
+                console.error(`Error ${action} item:`, error.response.statusText);
+            }
+        },
+    },
+  };
+
+</script>
+
+<template>
+    <div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-striped table-hover text-center">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in items">
+                                <td>{{ item.title }}</td>
+                                <td>{{ item.category }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-warning" @click="$emit('edit-item', item)">
+                                        <i class="fa-solid fa-pencil"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <!-- Pagination Controls -->
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                                    <li class="page-item" :class="{ disabled: meta.previous_page === null }">
+                                        <button class="page-link" @click="goToPage(meta.previous_page)" :disabled="meta.previous_page === null">Previous</button>
+                                    </li>
+                                    <li
+                                        v-for="page in meta.total_page"
+                                        :key="page"
+                                        class="page-item"
+                                        :class="{ active: page === meta.page }"
+                                    >
+                                        <button class="page-link" @click="goToPage(page)">{{ page }}</button>
+                                    </li>
+                                    <li class="page-item" :class="{ disabled: meta.next_page === null }">
+                                        <button class="page-link" @click="goToPage(meta.next_page)" :disabled="meta.next_page === null">Next</button>
+                                    </li>
+                                </ul>
+                                </nav>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    import axios from 'axios';
+
+    export default {
+        data() {
+            return {
+                items: []
+            }
+        },
+
+        mounted() {
+            this.getData();
+        },
+
+        methods: {
+            async getData() {
+                try {
+                    const response = await axios.get(import.meta.env.VITE_API_URL + '/article?status=publish&limit=1&page=1');
+                    this.items = response.data.data;
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            },
+        },
+    }
+</script>
+  

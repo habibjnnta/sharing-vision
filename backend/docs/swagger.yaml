@@ -1,0 +1,135 @@
+definitions:
+  posts.Form:
+    properties:
+      category:
+        minLength: 3
+        type: string
+      content:
+        minLength: 200
+        type: string
+      status:
+        enum:
+        - publish
+        - draft
+        - trash
+        type: string
+      title:
+        minLength: 20
+        type: string
+    required:
+    - category
+    - content
+    - status
+    - title
+    type: object
+info:
+  contact: {}
+paths:
+  /article:
+    get:
+      consumes:
+      - application/json
+      description: Get All Article
+      parameters:
+      - description: Filter by Status
+        enum:
+        - publish
+        - draft
+        - trash
+        in: query
+        name: status
+        type: string
+      - description: Limit of pagination
+        in: query
+        name: limit
+        type: integer
+      - description: Page of pagination
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: Get All Article
+      tags:
+      - Article
+    post:
+      consumes:
+      - application/json
+      description: Create Article
+      parameters:
+      - description: Payload Body for Create Article [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/posts.Form'
+      produces:
+      - application/json
+      responses: {}
+      summary: Create Article
+      tags:
+      - Article
+  /article/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Article by ID
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: Delete Article
+      tags:
+      - Article
+    get:
+      consumes:
+      - application/json
+      description: Get Detail Article by ID
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: Get Detail Article
+      tags:
+      - Article
+    put:
+      consumes:
+      - application/json
+      description: Update Article
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Payload Body for Update Article [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/posts.Form'
+      produces:
+      - application/json
+      responses: {}
+      summary: Update Article
+      tags:
+      - Article
+  /check-connection:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses: {}
+swagger: "2.0"
